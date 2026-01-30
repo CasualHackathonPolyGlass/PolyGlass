@@ -1,0 +1,10 @@
+{
+  "env": {
+    "ANTHROPIC_AUTH_TOKEN": "sk-DXVuU7RDOS7JhZ9nBQojxvGAwhwTsHCO01OH68QmgPVE9zvR",
+    "ANTHROPIC_BASE_URL": "https://anyrouter.top",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  },
+  
+  "alwaysThinkingEnabled": true,
+  "model": "opus"
+}

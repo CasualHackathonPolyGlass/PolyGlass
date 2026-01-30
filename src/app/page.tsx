@@ -1,22 +1,23 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import Link from "next/link";
 import { ArrowUpRight, Flame, Shield, Sparkles } from "lucide-react";
 import { Header } from "./components/header";
 import { StatCard } from "./components/stat-card";
-import { MarketActivity } from "./components/market-activity";
 import { TraderFeed } from "./components/trader-feed";
-import { MarketsTable } from "./components/markets-table";
-import { PillTabs } from "./components/pill-tabs";
-import { filters, marketActivity, marketsTable, networkStats, traderFeed } from "./data/mock";
+import { MarketCardList } from "./components/market-card";
+import { useStats } from "./hooks/useStats";
+import { useMarkets } from "./hooks/useMarkets";
+import { useLeaderboard } from "./hooks/useLeaderboard";
+
+function Skeleton({ className = "" }: { className?: string }) {
+  return <div className={`animate-pulse rounded bg-white/10 ${className}`} />;
+}
 
 export default function Home() {
-  const [activeFilter, setActiveFilter] = useState("All");
-
-  const filteredMarkets = useMemo(() => {
-    if (activeFilter === "All") return marketsTable;
-    return marketsTable.filter((m) => m.tags.map((t) => t.toLowerCase()).includes(activeFilter.toLowerCase()));
-  }, [activeFilter]);
+  const { data: stats, loading: statsLoading } = useStats();
+  const { markets, loading: marketsLoading } = useMarkets();
+  const { data: traders, loading: tradersLoading } = useLeaderboard(5);
 
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-6 py-8 lg:px-10">
@@ -88,27 +89,74 @@ export default function Home() {
       </section>
 
       <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {networkStats.map((stat) => (
-          <StatCard key={stat.label} {...stat} />
-        ))}
+        {statsLoading || !stats
+          ? Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="card p-4">
+                <Skeleton className="mb-2 h-4 w-24" />
+                <Skeleton className="h-8 w-32" />
+              </div>
+            ))
+          : stats.map((stat) => <StatCard key={stat.label} {...stat} />)}
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <MarketActivity items={marketActivity} />
-        </div>
-        <TraderFeed items={traderFeed} />
-      </section>
-
+      {/* Markets Section */}
       <section className="flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-white/50">Market Prices</p>
-            <h3 className="text-xl font-semibold text-white">Real-time Polymarket board</h3>
+            <p className="text-xs uppercase tracking-[0.2em] text-white/50">Markets</p>
+            <h3 className="text-xl font-semibold text-white">Real-time Polymarket</h3>
           </div>
-          <PillTabs tabs={filters} active={activeFilter} onSelect={setActiveFilter} />
+          <Link
+            href="/markets"
+            className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/70 transition hover:bg-white/10 hover:text-white"
+          >
+            View all
+            <ArrowUpRight className="h-4 w-4" />
+          </Link>
         </div>
-        <MarketsTable rows={filteredMarkets} />
+        {marketsLoading || !markets ? (
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="card p-4">
+                <Skeleton className="mb-3 h-10 w-full" />
+                <Skeleton className="mb-2 h-4 w-24" />
+                <Skeleton className="h-2 w-full" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <MarketCardList markets={markets} maxItems={8} />
+        )}
+      </section>
+
+      {/* Traders Section */}
+      <section className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          {marketsLoading || !markets ? (
+            <div className="card h-full p-5">
+              <Skeleton className="mb-4 h-6 w-48" />
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="mb-3 h-20 w-full" />
+              ))}
+            </div>
+          ) : (
+            <div className="card p-5">
+              <p className="text-xs uppercase tracking-[0.2em] text-white/50">Top Volume</p>
+              <h3 className="mb-4 text-lg font-semibold text-white">Hot Markets</h3>
+              <MarketCardList markets={[...markets].sort((a, b) => b.volume - a.volume)} maxItems={4} />
+            </div>
+          )}
+        </div>
+        {tradersLoading || !traders ? (
+          <div className="card h-full p-5">
+            <Skeleton className="mb-4 h-6 w-36" />
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className="mb-3 h-14 w-full" />
+            ))}
+          </div>
+        ) : (
+          <TraderFeed items={traders} />
+        )}
       </section>
     </main>
   );

@@ -1,6 +1,18 @@
+import Link from "next/link";
 import { Sparkles, WalletMinimal, Menu, Search } from "lucide-react";
 
-const navItems = ["Overview", "Markets", "Liquidity", "Insights", "API"];
+interface NavItem {
+  label: string;
+  href: string;
+}
+
+const navItems: NavItem[] = [
+  { label: "Overview", href: "/" },
+  { label: "Markets", href: "/markets" },
+  { label: "Smart Money", href: "/smart-money" },
+  { label: "Insights", href: "#" },
+  { label: "API", href: "#" },
+];
 
 export function Header() {
   return (
@@ -18,12 +30,13 @@ export function Header() {
 
       <nav className="hidden items-center gap-4 text-sm text-white/70 lg:flex">
         {navItems.map((item) => (
-          <button
-            key={item}
+          <Link
+            key={item.label}
+            href={item.href}
             className="rounded-full px-4 py-2 transition-colors hover:bg-white/10 hover:text-white"
           >
-            {item}
-          </button>
+            {item.label}
+          </Link>
         ))}
       </nav>
 
