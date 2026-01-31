@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Sparkles, WalletMinimal, Menu, Search } from "lucide-react";
+import { Sparkles, WalletMinimal, Menu } from "lucide-react";
 
 interface NavItem {
   label: string;
@@ -11,6 +11,7 @@ const navItems: NavItem[] = [
   { label: "Markets", href: "/markets" },
   { label: "Smart Money", href: "/smart-money" },
   { label: "Insights", href: "#" },
+  { label: "Calendar", href: "/calendar" }, // new item before API
   { label: "API", href: "#" },
 ];
 
@@ -41,13 +42,6 @@ export function Header() {
       </nav>
 
       <div className="flex items-center gap-3">
-        <div className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/70 shadow-inner shadow-black/30 backdrop-blur md:flex">
-          <Search className="h-4 w-4 text-white/50" />
-          <input
-            placeholder="Search markets, traders, chains..."
-            className="w-52 bg-transparent text-white/80 placeholder:text-white/40 focus:outline-none"
-          />
-        </div>
         <button className="hidden items-center gap-2 rounded-full border border-teal-200/40 bg-gradient-to-r from-teal-400/20 to-indigo-500/30 px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_40px_rgba(109,243,231,0.25)] transition hover:scale-[1.01] md:flex">
           <WalletMinimal className="h-4 w-4" />
           Connect
