@@ -13,9 +13,10 @@ const MAX_MARKETS = 10000; // MVP: 限制最多拉取市场数
 /**
  * 从 Gamma API 获取一页市场数据
  * 按 ID 降序排列，获取最新市场
+ * 注：不限制 active，获取所有市场（包括已结算的）
  */
 async function fetchPage(offset: number, limit: number): Promise<GammaMarketResponse[]> {
-  const url = `${GAMMA_API_BASE}/markets?active=true&limit=${limit}&offset=${offset}&order=id&ascending=false`;
+  const url = `${GAMMA_API_BASE}/markets?limit=${limit}&offset=${offset}&order=id&ascending=false`;
   logger.debug(`Fetching: ${url}`);
 
   const res = await fetch(url);

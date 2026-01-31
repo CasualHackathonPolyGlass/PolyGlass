@@ -173,6 +173,7 @@ export function buildMarketData(gammaMarkets: GammaMarketResponse[]): MarketData
       endDate: m.endDate,
       image: m.image,
       outcomes,
+      active: m.active,
     });
 
     // clobTokenIds[0] = NO, clobTokenIds[1] = YES
