@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { ArrowLeft, TrendingUp, Users, Trophy, Wallet } from "lucide-react";
+import { TrendingUp, Users, Trophy, Wallet } from "lucide-react";
+import { Header } from "../components/header";
 import { useSmartMoney } from "../hooks/useSmartMoney";
 import { SmartTradersTable } from "./components/smart-traders-table";
 import { TraderDrawer } from "./components/trader-drawer";
@@ -57,19 +57,14 @@ export default function SmartMoneyPage() {
 
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-6 px-6 py-8 lg:px-10">
-      {/* Header */}
+      {/* Header 导航 */}
+      <Header />
+
+      {/* 页面标题和视图切换 */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link
-            href="/"
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 transition hover:bg-white/10"
-          >
-            <ArrowLeft className="h-5 w-5 text-white/70" />
-          </Link>
-          <div>
-            <h1 className="text-2xl font-semibold text-white">Smart Money Leaderboard</h1>
-            <p className="text-sm text-white/50">Track top Polymarket traders by score, PnL and performance</p>
-          </div>
+        <div>
+          <h1 className="text-2xl font-semibold text-white">Smart Money Leaderboard</h1>
+          <p className="text-sm text-white/50">Track top Polymarket traders by score, PnL and performance</p>
         </div>
 
         {/* View Toggle */}
