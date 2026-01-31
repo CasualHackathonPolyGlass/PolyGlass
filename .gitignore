@@ -44,6 +44,8 @@ yarn-error.log*
 
 # database
 /data/app.db
+/data/markets-cache.json
+/data/*.json
 
 # logs
 /logs/

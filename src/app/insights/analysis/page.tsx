@@ -36,25 +36,25 @@ function AnalysisContent() {
 
     // Direct Demo Mode: Skip API fetch and show mock data immediately
     const timer = setTimeout(() => {
-        // Mock result based on URL keywords or random if generic
-        const isNegative = url.toLowerCase().includes("shutdown") || url.toLowerCase().includes("recession");
+      // Mock result based on URL keywords or random if generic
+      const isNegative = url.toLowerCase().includes("shutdown") || url.toLowerCase().includes("recession");
 
-        setResult({
-            verdict: isNegative ? "YES" : "NO",
-            confidence: 85,
-            summary: "Based on current legislative gridlock and historical precedents, the probability of a government shutdown remains elevated.",
-            keyFactors: [
-                "Legislative deadline approaching with no consensus",
-                "Partisan disagreement on spending bills",
-                "Historical pattern of last-minute resolutions vs shutdowns"
-            ],
-            sources: [
-                "Polymarket Order Book",
-                "Washington Post Analysis",
-                "FiveThirtyEight Forecasts"
-            ]
-        });
-        setIsLoading(false);
+      setResult({
+        verdict: isNegative ? "YES" : "NO",
+        confidence: 85,
+        summary: "Based on current legislative gridlock and historical precedents, the probability of a government shutdown remains elevated.",
+        keyFactors: [
+          "Legislative deadline approaching with no consensus",
+          "Partisan disagreement on spending bills",
+          "Historical pattern of last-minute resolutions vs shutdowns"
+        ],
+        sources: [
+          "Polymarket Order Book",
+          "Washington Post Analysis",
+          "FiveThirtyEight Forecasts"
+        ]
+      });
+      setIsLoading(false);
     }, 2000); // 2 seconds delay for effect
 
     return () => clearTimeout(timer);
@@ -102,7 +102,7 @@ function AnalysisContent() {
             <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
             <h2 className="text-xl font-bold mb-2">Analysis Failed</h2>
             <p className="text-white/60 mb-6">{error || "Unable to analyze this market."}</p>
-            <Button 
+            <Button
               onClick={() => router.push('/insights')}
               className="w-full bg-white/10 hover:bg-white/20 text-white"
             >
@@ -125,8 +125,8 @@ function AnalysisContent() {
       <div className="max-w-4xl mx-auto relative z-10">
         {/* Header */}
         <div className="mb-8">
-          <Button 
-            variant="ghost" 
+          <Button
+            variant="ghost"
             onClick={() => router.back()}
             className="text-white/50 hover:text-white pl-0 hover:bg-transparent mb-4"
           >
@@ -135,10 +135,10 @@ function AnalysisContent() {
           <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60 mb-2">
             Market Analysis
           </h1>
-          <a 
-            href={url!} 
-            target="_blank" 
-            rel="noopener noreferrer" 
+          <a
+            href={url!}
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-white/40 hover:text-white/60 text-sm truncate block max-w-full transition-colors"
           >
             {url} <ExternalLink className="inline w-3 h-3 ml-1" />
@@ -166,12 +166,12 @@ function AnalysisContent() {
                     </Badge>
                   </div>
                 </div>
-                
-                <Button 
+
+                <Button
                   className={`
                     w-full md:w-auto px-8 py-6 text-lg font-semibold shadow-lg transition-all hover:scale-[1.02]
-                    ${result.verdict === 'YES' 
-                      ? 'bg-emerald-500 hover:bg-emerald-400 text-black shadow-emerald-500/20' 
+                    ${result.verdict === 'YES'
+                      ? 'bg-emerald-500 hover:bg-emerald-400 text-black shadow-emerald-500/20'
                       : 'bg-rose-500 hover:bg-rose-400 text-white shadow-rose-500/20'
                     }
                   `}

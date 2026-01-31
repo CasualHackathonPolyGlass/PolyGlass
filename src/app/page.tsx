@@ -6,6 +6,7 @@ import { Header } from "./components/header";
 import { StatCard } from "./components/stat-card";
 import { TraderFeed } from "./components/trader-feed";
 import { MarketCardList } from "./components/market-card";
+import { MarketHeatmap } from "./components/market-heatmap";
 import { useStats } from "./hooks/useStats";
 import { useMarkets } from "./hooks/useMarkets";
 import { useLeaderboard } from "./hooks/useLeaderboard";
@@ -91,42 +92,51 @@ export default function Home() {
       <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {statsLoading || !stats
           ? Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="card p-4">
-                <Skeleton className="mb-2 h-4 w-24" />
-                <Skeleton className="h-8 w-32" />
-              </div>
-            ))
+            <div key={i} className="card p-4">
+              <Skeleton className="mb-2 h-4 w-24" />
+              <Skeleton className="h-8 w-32" />
+            </div>
+          ))
           : stats.map((stat) => <StatCard key={stat.label} {...stat} />)}
       </section>
 
-      {/* Markets Section */}
-      <section className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-white/50">Markets</p>
-            <h3 className="text-xl font-semibold text-white">Real-time Polymarket</h3>
+      <section className="grid gap-6 lg:grid-cols-2">
+        {/* Left: Real-time Polymarket */}
+        <div className="flex flex-col gap-4 h-full">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-white/50">Markets</p>
+              <h3 className="text-xl font-semibold text-white">Real-time Polymarket</h3>
+            </div>
+            <Link
+              href="/markets"
+              className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/70 transition hover:bg-white/10 hover:text-white"
+            >
+              View all
+              <ArrowUpRight className="h-4 w-4" />
+            </Link>
           </div>
-          <Link
-            href="/markets"
-            className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/70 transition hover:bg-white/10 hover:text-white"
-          >
-            View all
-            <ArrowUpRight className="h-4 w-4" />
-          </Link>
+          {marketsLoading || !markets ? (
+            <div className="grid gap-3 sm:grid-cols-2 h-full">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="card p-4">
+                  <Skeleton className="mb-3 h-10 w-full" />
+                  <Skeleton className="mb-2 h-4 w-24" />
+                  <Skeleton className="h-2 w-full" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="h-full">
+              <MarketCardList markets={markets} maxItems={8} className="h-full grid-cols-2" />
+            </div>
+          )}
         </div>
-        {marketsLoading || !markets ? (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="card p-4">
-                <Skeleton className="mb-3 h-10 w-full" />
-                <Skeleton className="mb-2 h-4 w-24" />
-                <Skeleton className="h-2 w-full" />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <MarketCardList markets={markets} maxItems={8} />
-        )}
+
+        {/* Right: Heatmap Section */}
+        <div className="h-full">
+          <MarketHeatmap markets={markets} loading={marketsLoading} />
+        </div>
       </section>
 
       {/* Traders Section */}
@@ -142,8 +152,12 @@ export default function Home() {
           ) : (
             <div className="card p-5">
               <p className="text-xs uppercase tracking-[0.2em] text-white/50">Top Volume</p>
-              <h3 className="mb-4 text-lg font-semibold text-white">Hot Markets</h3>
-              <MarketCardList markets={[...markets].sort((a, b) => b.volume - a.volume)} maxItems={4} />
+              <h3 className="mb-4 text-lg font-semibold text-white">Trending Markets</h3>
+              <MarketCardList
+                markets={[...markets].sort((a, b) => b.volume - a.volume)}
+                maxItems={4}
+                variant="compact"
+              />
             </div>
           )}
         </div>

@@ -41,14 +41,14 @@ export function useStats() {
         const s: StatsData = json.data;
         setData([
           {
-            label: "Total Volume",
+            label: "Total Volume(24H)",
             value: formatUsd(s.totalVolume),
             change: 0,
             badge: "Live",
             hint: "Aggregated across all Polymarket markets",
           },
           {
-            label: "Total Trades",
+            label: "Total Trades(24H)",
             value: formatNumber(s.totalTrades),
             change: 0,
             badge: "On-chain",
@@ -62,7 +62,7 @@ export function useStats() {
             hint: "Markets with recorded trades",
           },
           {
-            label: "Unique Traders",
+            label: "Unique Traders(24H)",
             value: formatNumber(s.activeTraders),
             change: 0,
             badge: "Growth",
