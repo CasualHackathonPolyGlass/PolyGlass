@@ -34,21 +34,23 @@ export function getTags(address?: string): TagRow[] {
 }
 
 /**
- * 批量查询多个地址的标签
+ * 批量查询多个地址的标签（Turso 异步 API）
  */
-export function getTagsForAddresses(addresses: string[]): Record<string, string[]> {
+export async function getTagsForAddresses(addresses: string[]): Promise<Record<string, string[]>> {
   if (addresses.length === 0) return {};
 
   const db = getDb();
-  const placeholders = addresses.map(() => "?").join(",");
   const lowerAddrs = addresses.map((a) => a.toLowerCase());
+  const placeholders = lowerAddrs.map(() => "?").join(",");
 
-  const rows = db
-    .prepare(`SELECT address, tag FROM address_tags WHERE address IN (${placeholders})`)
-    .all(...lowerAddrs) as Array<{ address: string; tag: string }>;
+  const res = await db.execute({
+    sql: `SELECT address, tag FROM address_tags WHERE address IN (${placeholders})`,
+    args: lowerAddrs,
+  });
 
   const result: Record<string, string[]> = {};
-  for (const row of rows) {
+  for (const r of res.rows) {
+    const row = r as unknown as { address: string; tag: string };
     if (!result[row.address]) result[row.address] = [];
     result[row.address].push(row.tag);
   }
