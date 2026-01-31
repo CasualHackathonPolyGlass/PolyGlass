@@ -11,6 +11,8 @@ import { MarketHeatmap } from "./components/market-heatmap";
 import { useStats } from "./hooks/useStats";
 import { useMarkets } from "./hooks/useMarkets";
 import { useLeaderboard } from "./hooks/useLeaderboard";
+import { useAnomalies } from "./hooks/useAnomalies";
+import { AnomalyCard } from "./components/anomaly-card";
 
 function Skeleton({ className = "" }: { className?: string }) {
   return <div className={`animate-pulse rounded bg-white/10 ${className}`} />;
@@ -18,8 +20,9 @@ function Skeleton({ className = "" }: { className?: string }) {
 
 export default function Home() {
   const { data: stats, loading: statsLoading } = useStats();
-  const { markets, loading: marketsLoading } = useMarkets();
+  const { markets, events, marketEvents, loading: marketsLoading } = useMarkets();
   const { data: traders, loading: tradersLoading } = useLeaderboard(5);
+  const { anomalies } = useAnomalies({ markets, events, marketEvents, loading: marketsLoading });
 
   // 为 Real-time Polymarket 随机选择 8 个事件
   const randomMarkets = useMemo(() => {
@@ -161,7 +164,7 @@ export default function Home() {
 
       {/* Traders Section */}
       <section className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-2 flex flex-col gap-4">
           {marketsLoading || !markets ? (
             <div className="card h-full p-5">
               <Skeleton className="mb-4 h-6 w-48" />
@@ -180,17 +183,20 @@ export default function Home() {
               />
             </div>
           )}
+          <AnomalyCard anomalies={anomalies} loading={marketsLoading || !markets} />
         </div>
-        {tradersLoading || !traders ? (
-          <div className="card h-full p-5">
-            <Skeleton className="mb-4 h-6 w-36" />
-            {Array.from({ length: 4 }).map((_, i) => (
-              <Skeleton key={i} className="mb-3 h-14 w-full" />
-            ))}
-          </div>
-        ) : (
-          <TraderFeed items={traders} />
-        )}
+        <div className="flex flex-col">
+          {tradersLoading || !traders ? (
+            <div className="card h-full p-5">
+              <Skeleton className="mb-4 h-6 w-36" />
+              {Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="mb-3 h-14 w-full" />
+              ))}
+            </div>
+          ) : (
+            <TraderFeed items={traders} />
+          )}
+        </div>
       </section>
     </main>
   );
