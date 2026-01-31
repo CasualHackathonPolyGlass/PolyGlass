@@ -1,12 +1,15 @@
 "use client";
 
+import { ExternalLink } from "lucide-react";
 import type { Market } from "@/types/market";
 import { VolumeBar } from "./volume-bar";
+import { TwoSidePriceBar } from "./two-side-price-bar";
 
 interface OutcomeRowProps {
   market: Market;
-  maxVolume: number;
-  maxOpenInterest: number;
+  eventSlug: string;
+  outcomeMaxVolume: number;
+  outcomeMaxOI: number;
 }
 
 /** 格式化金额 */
@@ -17,89 +20,87 @@ function formatMoney(value: number): string {
   return `$${value.toFixed(2)}`;
 }
 
-/** 计算 No/Yes ratio */
-function calcRatio(priceYes: number): string {
-  if (priceYes === 0) return "∞";
-  const priceNo = 1 - priceYes;
-  const ratio = priceNo / priceYes;
-  if (ratio >= 100) return ratio.toFixed(0);
-  if (ratio >= 10) return ratio.toFixed(1);
-  return ratio.toFixed(2);
-}
-
-export function OutcomeRow({ market, maxVolume, maxOpenInterest }: OutcomeRowProps) {
+export function OutcomeRow({ market, eventSlug, outcomeMaxVolume, outcomeMaxOI }: OutcomeRowProps) {
   const openInterest = market.volume * 0.6;
-  const isActive = !market.endDate || new Date(market.endDate) > new Date();
+  const priceNo = 1 - market.priceYes;
+  const hasVolume = market.volume > 0;
+  const hasOI = openInterest > 0;
+
+  // 获取 outcome 名称，默认 No/Yes
+  const [outcome0, outcome1] = market.outcomes ?? ["No", "Yes"];
 
   return (
-    <tr className="bg-white/[0.02] transition hover:bg-white/[0.04]">
-      {/* 缩进列 + 图片 + 名称 */}
-      <td className="pl-10 pr-3 py-2">
-        <div className="flex items-center gap-3">
+    <tr className="bg-white/[0.03] text-xs transition hover:bg-white/[0.05]">
+      {/* 1. 展开列占位（缩进） */}
+      <td className="pl-6 py-2"></td>
+
+      {/* 2. Market 列 */}
+      <td className="px-3 py-2">
+        <div className="flex items-center gap-2">
           {market.image && (
-            <img
-              src={market.image}
-              alt=""
-              className="h-6 w-6 rounded-full object-cover"
-            />
+            <img src={market.image} alt="" className="h-5 w-5 rounded-full object-cover" />
           )}
-          <span className="text-white/90 text-sm truncate max-w-[200px]">
-            {market.title}
-          </span>
-          {isActive && (
-            <span className="rounded bg-green-500/20 px-1.5 py-0.5 text-xs text-green-400">
-              Active
-            </span>
-          )}
+          <a
+            href={`https://polymarket.com/event/${eventSlug}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group/link flex items-center gap-1 text-white/80 hover:text-blue-400 transition"
+          >
+            <span className="truncate max-w-[180px]">{market.title}</span>
+            <ExternalLink className="h-3 w-3 opacity-0 group-hover/link:opacity-100 transition flex-shrink-0" />
+          </a>
         </div>
       </td>
 
-      {/* No / Yes 价格 */}
+      {/* 3. Price 列 - 双向价格柱状图 */}
       <td className="px-3 py-2">
-        <div className="flex items-center gap-4 text-sm">
-          <div className="flex items-center gap-1">
-            <span className="text-white/50">No</span>
-            <span className="text-white/70">${(1 - market.priceYes).toFixed(2)}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <span className="text-white/50">Yes</span>
-            <span className="font-medium text-green-400">${market.priceYes.toFixed(2)}</span>
-            <span className="w-2 h-2 rounded-full bg-green-500 inline-block ml-1"></span>
-          </div>
+        <div className="min-w-[220px]">
+          <TwoSidePriceBar
+            yes={market.priceYes}
+            no={priceNo}
+            labelYes={outcome1}
+            labelNo={outcome0}
+          />
         </div>
       </td>
 
-      {/* Source */}
+      {/* 4. Source 列 */}
       <td className="px-3 py-2">
-        <span className="rounded bg-purple-500/20 px-2 py-0.5 text-xs text-purple-300">
-          Polymarket
-        </span>
+        <span className="rounded bg-purple-500/20 px-2 py-0.5 text-purple-300">Polymarket</span>
       </td>
 
-      {/* Volume */}
+      {/* 5. Volume 列 */}
       <td className="px-3 py-2 text-right">
-        <div className="flex flex-col items-end gap-1">
-          <span className="text-sm text-white/70">{formatMoney(market.volume)}</span>
-          <div className="w-24">
-            <VolumeBar value={market.volume} denom={maxVolume} />
+        {hasVolume ? (
+          <div className="flex flex-col items-end gap-0.5">
+            <span className="text-white/60">{formatMoney(market.volume)}</span>
+            <div className="w-20">
+              <VolumeBar value={market.volume} denom={outcomeMaxVolume} />
+            </div>
           </div>
-        </div>
+        ) : (
+          <span className="text-white/40">—</span>
+        )}
       </td>
 
-      {/* Open Interest */}
+      {/* 6. Open Interest 列 */}
       <td className="px-3 py-2 text-right">
-        <div className="flex flex-col items-end gap-1">
-          <span className="text-sm text-white/70">{formatMoney(openInterest)}</span>
-          <div className="w-24">
-            <VolumeBar value={openInterest} denom={maxOpenInterest} />
+        {hasOI ? (
+          <div className="flex flex-col items-end gap-0.5">
+            <span className="text-white/60">{formatMoney(openInterest)}</span>
+            <div className="w-20">
+              <VolumeBar value={openInterest} denom={outcomeMaxOI} />
+            </div>
           </div>
-        </div>
+        ) : (
+          <span className="text-white/40">—</span>
+        )}
       </td>
 
-      {/* 占位列 */}
-      <td className="px-3 py-2"></td>
-      <td className="px-3 py-2"></td>
-      <td className="px-3 py-2"></td>
+      {/* 7-9. 占位列 */}
+      <td className="py-2"></td>
+      <td className="py-2"></td>
+      <td className="py-2"></td>
     </tr>
   );
 }
