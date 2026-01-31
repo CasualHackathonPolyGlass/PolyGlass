@@ -1,51 +1,107 @@
-# PolyGlass · Polymarket 数据指挥舱
+# PolyGlass
 
-面向 Web3 的 Polymarket 数据聚合与可视化前端，基于 Next.js(App Router) + Tailwind v4 + pnpm。当前内置霓虹玻璃风 UI、示例数据与组件拆分，可直接接入真实链上/官方数据源。
+## 项目简介
+
+PolyGlass 是一个 Polymarket 链上数据聚合与可视化平台，为量化团队、DAO 和交易者提供机构级的预测市场数据分析工具。
+
+## 技术架构
+
+**前端**
+- Next.js 16 (App Router) + React 19 + TypeScript
+- Tailwind CSS 4 (霓虹玻璃风 UI)
+- Recharts 数据可视化 + Three.js 3D 效果
+- Zustand 状态管理 + React Query 数据获取
+
+**后端**
+- Next.js API Routes (Edge Runtime)
+- Turso (libSQL) 云数据库
+- Polygon RPC 链上数据索引
+
+**数据层**
+- Polymarket Gamma API (市场/事件数据)
+- Polygon 链上日志 (交易/入金事件)
+- ethers.js 链上交互
 
 ## 快速开始
+
+### 环境要求
+
+- Node.js 20+
+- pnpm 9+
+- 有效的 Polygon RPC URL
+- Turso 数据库账号（可选，无配置时自动降级到 Gamma API）
+
+### 安装步骤
+
+1. 克隆仓库
 ```bash
-pnpm install        # 安装依赖
-pnpm dev            # 启动开发，http://localhost:3000
-pnpm lint           # 代码检查
-pnpm build && pnpm start   # 生产模式
+git clone https://github.com/your-org/PolyGlass.git
+cd PolyGlass
 ```
 
-## 目录结构（关键模块）
-- `src/app/layout.tsx`：全局布局、字体/SEO 元信息。
-- `src/app/globals.css`：主题与玻璃风样式变量。
-- `src/app/page.tsx`：主页编排（英雄区、指标卡、活动、交易员榜、表格）。
-- `src/app/components/`：
-  - `header.tsx`：导航与搜索/连接按钮。
-  - `stat-card.tsx`：指标卡片。
-  - `market-activity.tsx`：热门市场列表。
-  - `trader-feed.tsx`：交易员收益榜。
-  - `markets-table.tsx`：可筛选市场表格。
-  - `pill-tabs.tsx`：胶囊标签切换。
-- `src/app/data/mock.ts`：前端静态 mock 数据（待替换为真实源）。
+2. 安装依赖
+```bash
+pnpm install
+```
 
-## 模块规划与演进
-1) 数据层
-   - 新增 `src/lib/polymarket.ts`：封装 Polymarket 官方 API / GoldSky / Substreams 请求，定义类型。
-   - 新增 `src/app/api/markets/route.ts` 等 Route Handler：做字段裁剪、缓存与错误兜底，供前端 fetch。
-   - 前端用 SWR/React Query 轮询或 SSE/WebSocket 做实时更新（可配置 `refreshInterval`）。
-2) 状态与交互
-   - 轻量状态管理（Zustand/Jotai）存放筛选条件、用户态、主题。
-   - 表格分页/排序/搜索联动 URL 查询参数，便于分享/回放。
-3) 可视化
-   - 为指标/表格行加入 sparkline、盘口深度图（可用 lightweight-charts 或 Recharts）。
-   - Skeleton 与乐观更新，保证实时感。
-4) 设计系统
-   - 将色板/阴影/圆角抽象为 tokens（如 `src/styles/tokens.css`），组件依赖 tokens 而非魔法值。
-5) 监控与质量
-   - 增加 E2E（Playwright）和组件测试（Vitest/RTL）。
-   - API 侧加入超时与 LRU/Redis 缓存，防抖高频请求。
+3. 配置环境变量
+```bash
+cp .env.example .env.local
+```
 
-## 数据接入示例（思路）
-- API 拉取：在 `polymarket.ts` 中使用 `fetch` 调官方 markets/trades/orderbook，返回统一字段。
-- Edge 路由：`route.ts` 中 `export const runtime = "edge";`，`fetch` 时 `cache: "no-store"` 或 `revalidate` 控制时效。
-- 前端消费：`useSWR("/api/markets", fetcher, { refreshInterval: 30000 })`，与现有 `mock` 类型兼容替换。
+编辑 `.env.local`：
+```env
+# Polygon RPC (必需)
+POLYGON_RPC_URL=https://polygon-rpc.com
 
-## 代码规范
-- TypeScript 全量，ESLint 已启用；组件保持无状态/可组合。
-- Tailwind 优先，必要时补充全局变量；避免内联魔法色值，复用 tokens。
-- 提交前运行 `pnpm lint`，必要时补充测试。 
+# Turso 数据库 (可选)
+TURSO_DATABASE_URL=libsql://your-db.turso.io
+TURSO_AUTH_TOKEN=your-token
+
+# Gamma API (可选，有默认值)
+GAMMA_API_BASE=https://gamma-api.polymarket.com
+```
+
+4. 运行项目
+```bash
+pnpm dev
+```
+
+### 运行命令
+
+| 命令 | 说明 |
+|------|------|
+| `pnpm dev` | 启动开发服务器 (http://localhost:3000) |
+| `pnpm build` | 构建生产版本 |
+| `pnpm start` | 启动生产服务器 |
+| `pnpm lint` | 代码检查 |
+| `pnpm test` | 运行测试 |
+| `pnpm fetch` | 手动同步市场数据 |
+
+## 功能说明
+
+- **实时市场数据**: 展示 Polymarket 活跃市场的赔率、交易量、持仓量
+- **市场热力图**: 按分类/交易量可视化市场活跃度
+- **Smart Money 追踪**: 识别和追踪高胜率交易者的链上行为
+- **交易员排行榜**: 按 ROI、胜率、交易量等维度排名
+- **事件日历**: 预测市场结算时间线视图
+- **AI 分析**: 基于 LLM 的市场趋势分析（可选）
+
+## 数据来源
+
+| 数据类型 | 来源 | 获取方式 |
+|----------|------|----------|
+| 市场/事件元数据 | Polymarket Gamma API | REST API 轮询 |
+| 实时价格 | Polymarket CLOB | WebSocket / REST |
+| 交易记录 | Polygon 链上日志 | RPC eth_getLogs |
+| 入金/出金 | USDC Transfer 事件 | RPC eth_getLogs |
+| 地址类型 | Polygon 链上状态 | RPC eth_getCode |
+
+**关键合约地址 (Polygon)**
+- CTF Exchange: `0x4bFb41d5B3570DeFd03C39a9A4D8dE6Bd8B8982E`
+- USDC.e: `0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174`
+- Native USDC: `0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359`
+
+## 团队成员
+
+- 待补充
