@@ -20,6 +20,30 @@ function formatUsd(n: number): string {
 function EventCard({ event, onClick }: { event: SmartMoneyEvent; onClick: () => void }) {
   const { smartMoneyStats } = event;
 
+  // 安全检查：如果 smartMoneyStats 不存在，显示占位内容
+  if (!smartMoneyStats) {
+    return (
+      <div
+        className="cursor-pointer rounded-xl border border-white/10 bg-white/5 p-4 transition hover:bg-white/10 hover:border-teal-500/30"
+        onClick={onClick}
+      >
+        <div className="mb-3">
+          <h3 className="text-base font-semibold text-white leading-tight line-clamp-2">
+            {event.title}
+          </h3>
+          {event.category && (
+            <span className="mt-1 inline-block text-xs text-white/50 bg-white/5 px-2 py-0.5 rounded">
+              {event.category}
+            </span>
+          )}
+        </div>
+        <div className="flex items-center justify-center py-8 text-white/40 text-sm">
+          No smart money data available
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="cursor-pointer rounded-xl border border-white/10 bg-white/5 p-4 transition hover:bg-white/10 hover:border-teal-500/30"
