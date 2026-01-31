@@ -2,13 +2,13 @@
 
 ## 项目简介
 
-PolyGlass 是一个 Polymarket 链上数据聚合与可视化平台，为量化团队、DAO 和交易者提供机构级的预测市场数据分析工具。
+PolyGlass 是一个 Polymarket 链上数据聚合与可视化平台，可基于 LLM 进行市场趋势分析，为量化团队和交易者提供机构级的预测市场数据分析工具。
 
 ## 技术架构
 
 **前端**
 - Next.js 16 (App Router) + React 19 + TypeScript
-- Tailwind CSS 4 (霓虹玻璃风 UI)
+- Tailwind CSS 4
 - Recharts 数据可视化 + Three.js 3D 效果
 - Zustand 状态管理 + React Query 数据获取
 
