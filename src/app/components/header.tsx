@@ -10,7 +10,7 @@ const navItems: NavItem[] = [
   { label: "Overview", href: "/" },
   { label: "Markets", href: "/markets" },
   { label: "Smart Money", href: "/smart-money" },
-  { label: "Insights", href: "#" },
+  { label: "Insights", href: "/insights" },
   { label: "Calendar", href: "/calendar" }, // new item before API
   { label: "API", href: "#" },
 ];
