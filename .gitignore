@@ -31,9 +31,14 @@ yarn-error.log*
 .pnpm-debug.log*
 
 # env files (only .env.example is committed)
+.env
 .env.local
 .env.prod
 .env.vercel
+
+# lock files (project uses pnpm)
+package-lock.json
+yarn.lock
 
 # vercel
 .vercel

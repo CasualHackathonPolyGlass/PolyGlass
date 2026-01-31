@@ -18,6 +18,10 @@ export {
   getEventById,
   getMarketsByEventId,
   getAllMarketEvents,
+  getEventsWithSmartMoneyStats,
+  getEventDetailWithSmartMoney,
+  getMarketsWithSmartMoneyByEventId,
+  getSmartMoneyHoldersByMarket,
 } from "./events";
 
 // Sync State 模块
