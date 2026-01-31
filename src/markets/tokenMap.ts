@@ -59,6 +59,28 @@ function parseOutcomePrices(raw: string | string[] | undefined): [number, number
 }
 
 /**
+ * 解析 outcomes（可能是字符串或数组）
+ * 返回 [outcome0, outcome1]，默认 ["No", "Yes"]
+ */
+function parseOutcomes(raw: string | string[] | undefined): [string, string] {
+  if (!raw) return ["No", "Yes"];
+  let outcomes: string[];
+  if (Array.isArray(raw)) {
+    outcomes = raw;
+  } else {
+    try {
+      outcomes = JSON.parse(raw);
+    } catch {
+      return ["No", "Yes"];
+    }
+  }
+  if (outcomes.length >= 2) {
+    return [outcomes[0], outcomes[1]];
+  }
+  return ["No", "Yes"];
+}
+
+/**
  * 从 Gamma 原始数据构建 MarketData（含事件数据）
  */
 export function buildMarketData(gammaMarkets: GammaMarketResponse[]): MarketData {
@@ -75,6 +97,7 @@ export function buildMarketData(gammaMarkets: GammaMarketResponse[]): MarketData
     }
 
     const [priceYes, priceNo] = parseOutcomePrices(m.outcomePrices);
+    const outcomes = parseOutcomes(m.outcomes);
 
     markets.push({
       marketId: m.id,
@@ -88,6 +111,7 @@ export function buildMarketData(gammaMarkets: GammaMarketResponse[]): MarketData
       volume: m.volumeNum ?? (parseFloat(m.volume || "0") || 0),
       endDate: m.endDate,
       image: m.image,
+      outcomes,
     });
 
     // clobTokenIds[0] = NO, clobTokenIds[1] = YES
