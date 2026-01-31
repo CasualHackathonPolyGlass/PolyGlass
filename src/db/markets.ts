@@ -52,7 +52,7 @@ export async function saveMarkets(markets: Market[]): Promise<number> {
       m.endDate || null,
       m.image || null,
       JSON.stringify(m.outcomes || ["No", "Yes"]),
-      1, // active
+      m.active ? 1 : 0,
     ],
   }));
   await client.batch(statements, "write");
@@ -108,6 +108,7 @@ export async function queryMarkets(filters: MarketFilters = {}): Promise<Market[
       endDate: row.end_date as string | undefined,
       image: row.image as string | undefined,
       outcomes: row.outcomes ? JSON.parse(row.outcomes as string) : ["No", "Yes"],
+      active: (row.active as number) === 1,
     };
   });
 }

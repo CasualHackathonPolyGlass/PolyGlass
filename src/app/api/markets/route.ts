@@ -15,7 +15,7 @@ import { fetchMarketsWithFallback } from "@/markets";
 export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const filters: MarketFilters = {
-    status: (url.searchParams.get("status") || "active") as "active" | "all",
+    status: (url.searchParams.get("status") || "all") as "active" | "all",
     tag: url.searchParams.get("tag") || undefined,
     search: url.searchParams.get("search") || undefined,
   };
