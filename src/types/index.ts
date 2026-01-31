@@ -24,4 +24,21 @@ export type {
   SortOrder,
   SmartMoneyQueryParams,
   SignalsQueryParams,
+  SmartMoneyView,
+  RetailFilterConfig,
 } from "./smart-money";
+
+export type {
+  OriginType,
+  OriginMetadata,
+  OriginMetadataRow,
+  RelayerConfig,
+  OriginDetectionResult,
+  TradeBehavior,
+} from "./origin";
+
+export type {
+  Deposit,
+  DepositRow,
+  DepositSummary,
+} from "./deposit";

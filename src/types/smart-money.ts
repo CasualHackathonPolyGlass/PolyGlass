@@ -42,6 +42,7 @@ export interface TraderDetail extends ScoredTrader {
 export interface SmartMoneyListResponse {
   data: ScoredTrader[];
   total: number;
+  view: SmartMoneyView;
   window: string;
 }
 
@@ -60,6 +61,18 @@ export interface SignalsResponse {
 /** 时间窗口类型 */
 export type TimeWindow = "1h" | "6h" | "24h" | "1d" | "7d" | "30d" | "all";
 
+/** Smart Money 视图类型 */
+export type SmartMoneyView = "all" | "retail";
+
+/** Retail 过滤配置 */
+export interface RetailFilterConfig {
+  requireEOA: boolean;
+  excludeRelayers: boolean;
+  requireDeposit: boolean;
+  minNetDepositUSDC: number;
+  includeProxyWallet: boolean;
+}
+
 /** 排序字段 */
 export type SortField = "score" | "roi" | "winRate" | "volume" | "realizedPnL";
 
@@ -68,6 +81,7 @@ export type SortOrder = "asc" | "desc";
 
 /** API 请求参数 */
 export interface SmartMoneyQueryParams {
+  view?: SmartMoneyView;
   window?: TimeWindow;
   sort?: SortField;
   order?: SortOrder;

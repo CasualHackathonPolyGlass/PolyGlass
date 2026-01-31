@@ -54,6 +54,8 @@ export interface RawLog {
     direction: string;
     price: number | null;
     origin_from: string | null;  // 真实 EOA
+    origin_type: string | null;  // 'EOA' | 'CONTRACT' | 'PROXY'
+    origin_is_relayer: number | null;  // 0/1 boolean
     market_title?: string;
   }
   
