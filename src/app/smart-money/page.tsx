@@ -8,6 +8,7 @@ import { useSmartMoney } from "../hooks/useSmartMoney";
 import { SmartTradersTable } from "./components/smart-traders-table";
 import { TraderDrawer } from "./components/trader-drawer";
 import { SignalsFeed } from "./components/signals-feed";
+import { SignalsEvents } from "./components/signals-events";
 
 function Skeleton({ className = "" }: { className?: string }) {
   return <div className={`animate-pulse rounded bg-white/10 ${className}`} />;
@@ -121,15 +122,15 @@ function SmartMoneyContent() {
         </div>
       )}
 
-      {/* Main Content: Table + Signals */}
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-        {/* Smart Traders Table */}
+      {/* Main Content: Leaderboard (Left) + Signals Events (Right) */}
+      <div className="grid gap-6 lg:grid-cols-[1fr_1fr]">
+        {/* Left: Smart Traders Leaderboard */}
         <div>
           {loading ? (
             <div className="rounded-xl border border-white/10 bg-white/5">
               <div className="border-b border-white/10 p-4">
                 <div className="flex gap-4">
-                  {Array.from({ length: 8 }).map((_, i) => <Skeleton key={i} className="h-4 w-20" />)}
+                  {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="h-4 w-20" />)}
                 </div>
               </div>
               {Array.from({ length: 8 }).map((_, i) => (
@@ -149,9 +150,9 @@ function SmartMoneyContent() {
           )}
         </div>
 
-        {/* Signals Feed Sidebar */}
-        <div className="hidden lg:block">
-          <SignalsFeed onSelectTrader={setSelectedAddress} />
+        {/* Right: Signals Events */}
+        <div>
+          <SignalsEvents />
         </div>
       </div>
 
