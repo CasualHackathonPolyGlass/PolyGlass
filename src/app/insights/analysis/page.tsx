@@ -102,7 +102,7 @@ function AnalysisContent() {
             <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
             <h2 className="text-xl font-bold mb-2">Analysis Failed</h2>
             <p className="text-white/60 mb-6">{error || "Unable to analyze this market."}</p>
-            <Button 
+            <Button
               onClick={() => router.push('/insights')}
               className="w-full bg-white/10 hover:bg-white/20 text-white"
             >

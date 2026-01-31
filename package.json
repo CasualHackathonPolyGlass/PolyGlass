@@ -44,6 +44,7 @@
     "react-dom": "19.2.3",
     "react-markdown": "^10.1.0",
     "tailwind-merge": "^3.4.0",
+    "recharts": "^3.7.0",
     "three": "^0.182.0",
     "unicornstudio-react": "2.0.1-1",
     "uuid": "^13.0.0",
