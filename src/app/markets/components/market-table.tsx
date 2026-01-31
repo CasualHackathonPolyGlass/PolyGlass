@@ -91,8 +91,7 @@ export function MarketTable({ markets, events, marketEvents }: MarketTableProps)
     }
 
     if (statusFilter === "active") {
-      const now = new Date();
-      result = result.filter((g) => !g.event.endDate || new Date(g.event.endDate) > now);
+      result = result.filter((g) => g.markets.some(m => m.active));
     }
 
     // 标签筛选（检查 group 中的 markets 是否有匹配的 tag）
