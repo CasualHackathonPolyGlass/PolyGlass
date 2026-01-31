@@ -58,6 +58,7 @@ const TAG_COLORS: Record<string, string> = {
   active: "bg-amber-500/20 text-amber-300",
   diversified: "bg-cyan-500/20 text-cyan-300",
   profitable: "bg-green-500/20 text-green-300",
+  depositor: "bg-teal-500/20 text-teal-300",
 };
 
 export function SmartTradersTable({ data, onSelectTrader }: SmartTradersTableProps) {
@@ -155,13 +156,19 @@ export function SmartTradersTable({ data, onSelectTrader }: SmartTradersTablePro
                   </td>
                   <td className="px-4 py-4">
                     <div className="flex flex-wrap gap-1">
-                      {entry.tags.length > 0 ? (
-                        entry.tags.slice(0, 3).map((tag) => (
-                          <span key={tag} className={`rounded-full px-2 py-0.5 text-xs ${TAG_COLORS[tag] || "bg-indigo-500/20 text-indigo-300"}`}>
-                            {tag}
-                          </span>
-                        ))
-                      ) : (
+                      {/* 显示 labels（来自 API 的 generateLabels） */}
+                      {entry.labels?.length > 0 && entry.labels.map((label) => (
+                        <span key={label} className={`rounded-full px-2 py-0.5 text-xs ${TAG_COLORS[label] || "bg-indigo-500/20 text-indigo-300"}`}>
+                          {label}
+                        </span>
+                      ))}
+                      {/* 显示 tags（系统标签 + 用户标签，排除已显示的 labels） */}
+                      {entry.tags.filter((t) => !entry.labels?.includes(t)).slice(0, 2).map((tag) => (
+                        <span key={tag} className={`rounded-full px-2 py-0.5 text-xs ${TAG_COLORS[tag] || "bg-indigo-500/20 text-indigo-300"}`}>
+                          {tag}
+                        </span>
+                      ))}
+                      {!entry.labels?.length && !entry.tags.length && (
                         <span className="text-white/30">-</span>
                       )}
                     </div>

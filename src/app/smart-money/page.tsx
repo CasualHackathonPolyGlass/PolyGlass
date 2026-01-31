@@ -43,7 +43,8 @@ function formatUsd(n: number): string {
 }
 
 export default function SmartMoneyPage() {
-  const { data, loading, error } = useSmartMoney({ limit: 100 });
+  const [view, setView] = useState<"all" | "retail">("retail");
+  const { data, loading, error } = useSmartMoney({ limit: 100, view });
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
 
   // 计算统计数据
@@ -57,16 +58,42 @@ export default function SmartMoneyPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-6 px-6 py-8 lg:px-10">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <Link
-          href="/"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 transition hover:bg-white/10"
-        >
-          <ArrowLeft className="h-5 w-5 text-white/70" />
-        </Link>
-        <div>
-          <h1 className="text-2xl font-semibold text-white">Smart Money Leaderboard</h1>
-          <p className="text-sm text-white/50">Track top Polymarket traders by score, PnL and performance</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Link
+            href="/"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5 transition hover:bg-white/10"
+          >
+            <ArrowLeft className="h-5 w-5 text-white/70" />
+          </Link>
+          <div>
+            <h1 className="text-2xl font-semibold text-white">Smart Money Leaderboard</h1>
+            <p className="text-sm text-white/50">Track top Polymarket traders by score, PnL and performance</p>
+          </div>
+        </div>
+
+        {/* View Toggle */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setView("retail")}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+              view === "retail"
+                ? "bg-teal-500/20 text-teal-300 border border-teal-500/30"
+                : "bg-white/5 text-white/50 border border-white/10 hover:bg-white/10"
+            }`}
+          >
+            Retail Only
+          </button>
+          <button
+            onClick={() => setView("all")}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition ${
+              view === "all"
+                ? "bg-teal-500/20 text-teal-300 border border-teal-500/30"
+                : "bg-white/5 text-white/50 border border-white/10 hover:bg-white/10"
+            }`}
+          >
+            All Traders
+          </button>
         </div>
       </div>
 
@@ -77,7 +104,7 @@ export default function SmartMoneyPage() {
         </div>
       ) : stats && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard icon={Users} label="Total Traders" value={stats.totalTraders.toLocaleString()} subValue="qualified smart money" />
+          <StatCard icon={Users} label="Total Traders" value={stats.totalTraders.toLocaleString()} subValue={view === "retail" ? "retail traders only" : "all traders"} />
           <StatCard icon={TrendingUp} label="Combined PnL" value={formatUsd(stats.totalPnl)} />
           <StatCard icon={Trophy} label="Avg Win Rate" value={`${stats.avgWinRate.toFixed(1)}%`} />
           <StatCard icon={Wallet} label="Top Trader PnL" value={formatUsd(stats.topTraderPnl)} />
