@@ -139,6 +139,18 @@ export async function getMarketsByEventId(eventId: string): Promise<EventMarket[
   return result.rows as unknown as EventMarket[];
 }
 
+/**
+ * 获取所有市场-事件关联
+ */
+export async function getAllMarketEvents(): Promise<MarketEvent[]> {
+  const client = getDb();
+  const result = await client.execute("SELECT market_id, event_id FROM market_events");
+  return result.rows.map((r) => {
+    const row = r as unknown as { market_id: string; event_id: string };
+    return { marketId: row.market_id, eventId: row.event_id };
+  });
+}
+
 // ============ Smart Money 聚合查询 ============
 
 /**
