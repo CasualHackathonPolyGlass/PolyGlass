@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { ArrowUpRight, Flame, Shield, Sparkles } from "lucide-react";
 import { Header } from "./components/header";
@@ -19,6 +20,25 @@ export default function Home() {
   const { data: stats, loading: statsLoading } = useStats();
   const { markets, loading: marketsLoading } = useMarkets();
   const { data: traders, loading: tradersLoading } = useLeaderboard(5);
+
+  // 为 Real-time Polymarket 随机选择 8 个事件
+  const randomMarkets = useMemo(() => {
+    if (!markets || markets.length === 0) return [];
+
+    // 筛选符合条件的市场：交易量 > $100k，排除极端赔率（已结算或停滞）
+    const qualifiedMarkets = markets.filter(m => {
+      const vol = Number(m.volume) || 0;
+      const price = m.priceYes;
+      const isStaleOdds = price === 0.5 || price >= 0.99 || price <= 0.01;
+      return vol > 100000 && !isStaleOdds;
+    });
+
+    // 如果符合条件的市场不足 8 个，使用全部市场
+    const sourcePool = qualifiedMarkets.length >= 8 ? qualifiedMarkets : markets;
+
+    // 随机打乱并取前 8 个
+    return [...sourcePool].sort(() => 0.5 - Math.random()).slice(0, 8);
+  }, [markets]);
 
   return (
     <main className="mx-auto flex min-h-screen max-w-7xl flex-col gap-8 px-6 py-8 lg:px-10">
@@ -128,7 +148,7 @@ export default function Home() {
             </div>
           ) : (
             <div className="h-full">
-              <MarketCardList markets={markets} maxItems={8} className="h-full grid-cols-2" />
+              <MarketCardList markets={randomMarkets} maxItems={8} className="h-full grid-cols-2" />
             </div>
           )}
         </div>
