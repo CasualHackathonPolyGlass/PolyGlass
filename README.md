@@ -208,7 +208,7 @@ pnpm tsx scripts/backfill-deposits.ts
 
 ### 🚀 中期计划
 
-- [ ] **多平台聚合** - 接入 Azuro、Overtime 等预测市场，统一数据视图
+- [ ] **多平台聚合** - 接入 Kalshi、Opinion 等预测市场，统一数据视图
 - [ ] **跨平台套利** - 识别不同平台间的赔率差异
 
 ### 🌐 远期愿景
