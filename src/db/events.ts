@@ -47,26 +47,14 @@ export async function saveMarketEvents(relations: MarketEvent[]): Promise<number
   return relations.length;
 }
 
-/** 事件统计信息 */
-interface EventStats {
-  id: string;
-  title: string;
-  slug: string;
-  category: string;
-  end_date: string;
-  active: number;
-  market_count: number;
-  total_volume: number;
-}
-
 /**
  * 获取事件列表（含统计）
  */
-export async function getEventsWithStats(): Promise<EventStats[]> {
+export async function getEventsWithStats(): Promise<Event[]> {
   const client = getDb();
   const result = await client.execute(`
     SELECT
-      e.id, e.title, e.slug, e.category, e.end_date, e.active,
+      e.id, e.title, e.slug, e.description, e.category, e.end_date, e.active,
       COUNT(DISTINCT me.market_id) as market_count,
       COALESCE(SUM(t.volume), 0) as total_volume
     FROM events e
@@ -78,18 +66,33 @@ export async function getEventsWithStats(): Promise<EventStats[]> {
     GROUP BY e.id
     ORDER BY total_volume DESC
   `);
-  return result.rows as unknown as EventStats[];
+
+  return result.rows.map((r) => {
+    const row = r as unknown as {
+      id: string; title: string; slug: string; description: string;
+      category: string; end_date: string; active: number;
+    };
+    return {
+      id: row.id,
+      title: row.title,
+      slug: row.slug,
+      description: row.description,
+      category: row.category,
+      endDate: row.end_date,
+      active: !!row.active,
+    };
+  });
 }
 
 /**
  * 获取事件详情
  */
-export async function getEventById(eventId: string): Promise<EventStats | undefined> {
+export async function getEventById(eventId: string): Promise<Event | undefined> {
   const client = getDb();
   const result = await client.execute({
     sql: `
       SELECT
-        e.id, e.title, e.slug, e.category, e.end_date, e.active,
+        e.id, e.title, e.slug, e.description, e.category, e.end_date, e.active,
         COUNT(DISTINCT me.market_id) as market_count,
         COALESCE(SUM(t.volume), 0) as total_volume
       FROM events e
@@ -103,9 +106,22 @@ export async function getEventById(eventId: string): Promise<EventStats | undefi
     `,
     args: [eventId],
   });
-  return result.rows.length > 0
-    ? (result.rows[0] as unknown as EventStats)
-    : undefined;
+
+  if (result.rows.length === 0) return undefined;
+
+  const row = result.rows[0] as unknown as {
+    id: string; title: string; slug: string; description: string;
+    category: string; end_date: string; active: number;
+  };
+  return {
+    id: row.id,
+    title: row.title,
+    slug: row.slug,
+    description: row.description,
+    category: row.category,
+    endDate: row.end_date,
+    active: !!row.active,
+  };
 }
 
 /** 事件下的市场信息 */
