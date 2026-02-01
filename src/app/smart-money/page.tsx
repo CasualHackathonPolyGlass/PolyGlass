@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { TrendingUp, Users, Trophy, Wallet } from "lucide-react";
 import { Header } from "../components/header";
 import { useSmartMoney } from "../hooks/useSmartMoney";
+import { useTraderProfile } from "../hooks/useTraderProfile";
 import { SmartTradersTable } from "./components/smart-traders-table";
 import { TraderDrawer } from "./components/trader-drawer";
+import { WalletSearch } from "./components/wallet-search";
+import { TraderProfilePanel } from "./components/trader-profile-panel";
 import { SignalsFeed } from "./components/signals-feed";
 import { SignalsEvents } from "./components/signals-events";
 
@@ -50,6 +53,14 @@ function SmartMoneyContent() {
   const [view, setView] = useState<"all" | "retail">("retail");
   const { data, loading, error } = useSmartMoney({ limit: 100, view });
   const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
+
+  // 钱包搜索状态
+  const [searchAddress, setSearchAddress] = useState<string | null>(null);
+  const { data: profileData, loading: profileLoading, error: profileError } = useTraderProfile(searchAddress);
+
+  const handleSearch = useCallback((address: string) => {
+    setSearchAddress(address || null);
+  }, []);
 
   // 从 URL 参数读取 trader 地址并自动打开详情
   useEffect(() => {
@@ -100,6 +111,24 @@ function SmartMoneyContent() {
           </button>
         </div>
       </div>
+
+      {/* Wallet Search */}
+      <WalletSearch onSearch={handleSearch} loading={profileLoading} />
+
+      {/* Trader Profile from search */}
+      {profileLoading && (
+        <div className="flex items-center justify-center rounded-xl border border-white/10 bg-white/5 py-12">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-teal-400 border-t-transparent" />
+        </div>
+      )}
+      {profileError && (
+        <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 p-4 text-rose-200">
+          Failed to load trader profile: {profileError}
+        </div>
+      )}
+      {profileData && !profileLoading && (
+        <TraderProfilePanel data={profileData} onClose={() => setSearchAddress(null)} />
+      )}
 
       {/* Stats Cards */}
       {loading ? (
