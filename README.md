@@ -268,7 +268,7 @@ pnpm tsx scripts/backfill-deposits.ts
 
 感谢 **[OGBC](https://www.ogbc.com/)** 提供的学习文档支持。
 
-感谢主办方 **[ETHPanda](https://ethpanda.org/)** 和 **[LXDAO](https://lxdao.io/)** 提供的休闲黑客松平台。
+感谢主办方 **[ETHPanda](https://ethpanda.org/)** 和 **[LXDAO](https://lxdao.io/)** 提供的黑客松平台。
 
 ---
 
