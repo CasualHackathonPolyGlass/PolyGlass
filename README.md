@@ -1,6 +1,6 @@
 <div align="center">
 
-#  ![logo](public/logo.png)PolyGlass
+#  ![logo](public/logo1.png)PolyGlass
 
 **Polymarket 链上数据聚合与可视化平台**
 
