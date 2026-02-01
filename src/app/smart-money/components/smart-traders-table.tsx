@@ -176,7 +176,7 @@ export function SmartTradersTable({ data, onSelectTrader }: SmartTradersTablePro
                   <td className="px-4 py-4">
                     <div className="flex items-center gap-1">
                       <Star className="h-3 w-3 text-amber-400" />
-                      <span className="font-medium text-white">{((entry.score ?? 0) * 100).toFixed(0)}</span>
+                      <span className="font-medium text-white">{(entry.score ?? 0).toFixed(0)}</span>
                     </div>
                   </td>
                   <td className="px-4 py-4">
