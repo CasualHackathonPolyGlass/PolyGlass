@@ -8,7 +8,7 @@ import type { GammaMarketResponse } from "@/types/market";
 const logger = createLogger("gamma");
 const GAMMA_API_BASE = process.env.GAMMA_API_BASE || "https://gamma-api.polymarket.com";
 const GAMMA_LIMIT = 500;
-const MAX_MARKETS = 10000; // MVP: 限制最多拉取市场数
+const MAX_MARKETS = 20000; // 增加限制以获取更多市场数据
 
 /**
  * 从 Gamma API 获取一页市场数据

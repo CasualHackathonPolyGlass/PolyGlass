@@ -1,6 +1,6 @@
 /**
  * API: GET /api/markets
- * 从 DB 读取市场数据（支持筛选）
+ * 优先从 Polymarket Gamma API 获取实时数据，DB 作为降级
  *
  * Query 参数:
  * - status: "active" | "all" (默认 active)
@@ -8,12 +8,14 @@
  * - search: 模糊搜索标题
  *
  * 缓存策略:
- * - Cache-Control: 60s 浏览器缓存 + 300s CDN stale-while-revalidate
+ * - Cache-Control: 60s CDN 缓存 + 300s stale-while-revalidate
+ * - 内存缓存: 60s TTL + SWR 后台刷新
  */
 import { NextRequest, NextResponse } from "next/server";
 import { queryMarkets, buildTokenMapFromMarkets, type MarketFilters } from "@/db/markets";
 import { getEventsWithStats, getAllMarketEvents } from "@/db/events";
 import { fetchMarketsWithFallback } from "@/markets";
+import type { Market } from "@/types/market";
 
 /** 为响应添加缓存头 */
 function withCacheHeaders(response: NextResponse): NextResponse {
@@ -22,6 +24,23 @@ function withCacheHeaders(response: NextResponse): NextResponse {
     "public, s-maxage=60, stale-while-revalidate=300"
   );
   return response;
+}
+
+/** 在内存中应用筛选条件 */
+function applyFilters(markets: Market[], filters: MarketFilters): Market[] {
+  let result = markets;
+  if (filters.status === "active") {
+    result = result.filter(m => m.active);
+  }
+  if (filters.tag) {
+    const tag = filters.tag;
+    result = result.filter(m => m.tags?.includes(tag));
+  }
+  if (filters.search) {
+    const term = filters.search.toLowerCase();
+    result = result.filter(m => m.title.toLowerCase().includes(term));
+  }
+  return result;
 }
 
 export async function GET(req: NextRequest) {
@@ -33,54 +52,47 @@ export async function GET(req: NextRequest) {
   };
 
   try {
-    // 尝试从 DB 读取
-    const markets = await queryMarkets(filters);
-
-    // 如果 DB 为空，回退到 Gamma API（首次同步前的兼容）
-    if (markets.length === 0) {
-      const fallback = await fetchMarketsWithFallback();
-      return withCacheHeaders(NextResponse.json({
-        data: fallback.markets,
-        events: fallback.events,
-        marketEvents: fallback.marketEvents,
-        tokenMap: fallback.tokenMap,
-        source: "gamma-fallback",
-      }));
-    }
-
-    // 从 DB 获取 events 和 marketEvents（并行查询）
-    const [events, marketEvents] = await Promise.all([
-      getEventsWithStats(),
-      getAllMarketEvents(),
-    ]);
-
-    // 从 markets 构建 tokenMap
-    const tokenMap = buildTokenMapFromMarkets(markets);
+    // 优先从 Gamma API 获取实时数据
+    const gammaData = await fetchMarketsWithFallback();
+    const filtered = applyFilters(gammaData.markets, filters);
 
     return withCacheHeaders(NextResponse.json({
-      data: markets,
-      events,
-      marketEvents,
-      tokenMap,
-      source: "database",
+      data: filtered,
+      events: gammaData.events,
+      marketEvents: gammaData.marketEvents,
+      tokenMap: gammaData.tokenMap,
+      source: "gamma-api",
     }));
-  } catch (error) {
-    console.error("Failed to fetch markets from DB, falling back to Gamma:", error);
+  } catch (gammaError) {
+    console.error("Gamma API failed, falling back to DB:", gammaError);
 
-    // 降级到 Gamma API
+    // 降级到 DB
     try {
-      const fallback = await fetchMarketsWithFallback();
+      const markets = await queryMarkets(filters);
+      if (markets.length === 0) {
+        return NextResponse.json(
+          { error: "No data available" },
+          { status: 503 },
+        );
+      }
+
+      const [events, marketEvents] = await Promise.all([
+        getEventsWithStats(),
+        getAllMarketEvents(),
+      ]);
+      const tokenMap = buildTokenMapFromMarkets(markets);
+
       return withCacheHeaders(NextResponse.json({
-        data: fallback.markets,
-        events: fallback.events,
-        marketEvents: fallback.marketEvents,
-        tokenMap: fallback.tokenMap,
-        source: "gamma-fallback",
+        data: markets,
+        events,
+        marketEvents,
+        tokenMap,
+        source: "database",
       }));
-    } catch (fallbackError) {
-      console.error("Gamma fallback also failed:", fallbackError);
+    } catch (dbError) {
+      console.error("DB fallback also failed:", dbError);
       return NextResponse.json(
-        { error: "Failed to fetch markets" },
+        { error: "Failed to fetch markets from all sources" },
         { status: 500 },
       );
     }
