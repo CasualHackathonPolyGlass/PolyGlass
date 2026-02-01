@@ -42,3 +42,18 @@ export type {
   DepositRow,
   DepositSummary,
 } from "./deposit";
+
+export type {
+  TraderProfileSummary,
+  WhaleLevel,
+  WhaleLevelInfo,
+  TraderProfileStats,
+  TraderPosition,
+  TraderPositionsResponse,
+  TraderTrade,
+  TraderTradesResponse,
+  PnLDataPoint,
+  PnLHistoryResponse,
+  TraderProfileData,
+  TraderProfileApiResponse,
+} from "./trader-profile";
